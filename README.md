@@ -1,13 +1,15 @@
 PYLINER - SCRIPT TO RUN ARBITRARY PYTHON CODE ON THE COMMAND LINE (PYTHON RECIPE)
 =================================================================================
 
+Created by [Drew Gulino](http://code.activestate.com/recipes/577075-pyliner-script-to-run-arbitrary-python-code-on-the/) as a recipe on [ActiveState](http://code.activestate.com/recipes/577075-pyliner-script-to-run-arbitrary-python-code-on-the/), the recipe has now been ported to [577075_Pyliner__Script_run_arbitrary_Pythcode](https://github.com/ActiveState/code/tree/master/recipes/Python/577075_Pyliner__Script_run_arbitrary_Pythcode). This project aims to make the recipe more accessible.
+
 A Python script that runs arbitrary Python scripts in an input loop. This allows one-liner Python scripts similarly to how Perl runs them (-l,-a,-n,-F, BEGIN, END)
 
 It provides additional syntax that allows multiline Python scripts to be run on a single line
 
 I work on *nix systems and use one-liner bash+awk+sed+etc.. scripts all the time, but I find I need Perl for some features. But I prefer and remember Python better. There are a few other scripts that allow something like Perl's cool one-liner '-lane', 'BEGIN' ,'END', etc, but don't have the full functionality.
 
-This script is based on http://code.activestate.com/recipes/437932-pyline-a-grep-like-sed-like-command-line-tool/ (Graham Fawcett + Jacob Oscarson, Mark Eichin) and Perl. It attempts to provide all the one-liner functionality that Perl provides. G.F., J.o., and M.E.'s original recipe is now hosted at [437932_Pyline_greplike_sedlike_commandline](https://github.com/ActiveState/code/tree/master/recipes/Python/437932_Pyline_greplike_sedlike_commandline/)
+This script is based on http://code.activestate.com/recipes/437932-pyline-a-grep-like-sed-like-command-line-tool/ (Graham Fawcett + Jacob Oscarson, Mark Eichin) and Perl. It attempts to provide all the one-liner functionality that Perl provides. G.F., J.O., and M.E.'s original recipe is now hosted at [437932_Pyline_greplike_sedlike_commandline](https://github.com/ActiveState/code/tree/master/recipes/Python/437932_Pyline_greplike_sedlike_commandline/)
 
 To get this to work, I had to create some additional syntax to allow Python to run on a single line without tabs. I understand this goes against much of what Python 'stands' for, but I'm pragmatic. This is no PEP to modify the language or a critique of Python's syntax; I just like the language and want to use it in an area that it's not well adapted for.
 
@@ -114,6 +116,5 @@ Example 3:
 
 License
 =======
-Originally created by [Drew Gulino](http://code.activestate.com/recipes/577075-pyliner-script-to-run-arbitrary-python-code-on-the/) at [ActiveState](http://code.activestate.com/recipes/577075-pyliner-script-to-run-arbitrary-python-code-on-the/) and now located at [577075_Pyliner__Script_run_arbitrary_Pythcode](https://github.com/ActiveState/code/tree/master/recipes/Python/577075_Pyliner__Script_run_arbitrary_Pythcode)
 
 This program is licensed  under the GNU V3 license. See [LICENSE.md](LICENSE.md) for the full text.
