@@ -1,17 +1,16 @@
 #!/usr/bin/env python
-
 """
+Python CLI executing one-liner python scripts.
+
 Dirty Copy from Drew Gulino on activestate
 ------------------------------------------
 
-Python script that runs one-liner python scripts similarly to how Perl runs them
-
-portions based on http://code.activestate.com/recipes/437932-pyline-a-grep-like-sed-like-command-line-tool/
+Python script that runs one-liner python scripts similarly to
+how Perl runs them. portions based on
+http://code.activestate.com/recipes/437932-pyline-a-grep-like-sed-like-command-line-tool/
 (Graham Fawcett, Jacob Oscarson, Mark Eichin)
 interface inspired by Perl
-"""
 
-"""
 Copyright (C) 2010  Drew Gulino
 
     This program is free software: you can redistribute it and/or modify
@@ -29,12 +28,13 @@ Copyright (C) 2010  Drew Gulino
 """
 
 import sys
-import re
 import getopt
 from getopt import GetoptError
 import os
 
+
 def usage(progname):
+    """Print the named program's CLI usage."""
     print "Usage: " + progname
     version()
     print """
@@ -67,7 +67,7 @@ def usage(progname):
         "#/" ends both the "BEGIN:" and "END:" portions of the script
     """
 
-#test.txt=
+# test.txt=
 """
 10,test
 1,rest
@@ -78,67 +78,82 @@ def usage(progname):
 """
 
 """
-cat test.txt | ./pyline.py -F"," -lane 'BEGIN:sum=0#/if i(0) > 90:sum+=i(0)) END:print sum#/'
-1100
+cat test.txt | ./pyline.py -F"," -lane \
+'BEGIN:sum=0#/if i(0) > 90:sum+=i(0)) END:print sum#/'
+
+> 1100
 """
 
 """
 pyliner:
-cat test.txt | ./pyliner.py -F"," -lane 'BEGIN:sum=0#/a=f(0);if a > 90:sum+=a END:print sum/NR#/'
-183.333333333
+cat test.txt | ./pyliner.py -F"," -lane \
+'BEGIN:sum=0#/a=f(0);if a > 90:sum+=a END:print sum/NR#/'
+
+> 183.333333333
 
 perl:
-cat test.txt | perl -F"," -lane 'BEGIN {$sum=0; } ;$sum=$sum+=@F[0] if @F[0]>90;END { print $sum/$.; }'
-183.333333333333
+cat test.txt | perl -F"," -lane \
+'BEGIN {$sum=0; } ;$sum=$sum+=@F[0] if @F[0]>90;END { print $sum/$.; }'
+
+> 183.333333333333
 """
 
+
 def version():
+    """Print version number."""
     print "version: 1.1"
 
 write = sys.stdout.write
 
+
 def indent_script(script_lines):
-    #indent lines
+    """Indent given script lines."""
     indent = 0
     next_indent = 0
     script = []
     for cmd in script_lines:
         cmd = cmd.strip()
-        if cmd[-1]==(":"):
-            indent=indent+1
-        if cmd[-1]=="?":
-            cmd=cmd[0:-1]
-            indent=indent-1
-        if cmd[-1]=="/":
-            cmd=cmd[0:-1]
-            indent=0
-        cmd=("\t"*next_indent)+cmd
+        if cmd[-1] == (":"):
+            indent = indent + 1
+        if cmd[-1] == "?":
+            cmd = cmd[0:-1]
+            indent = indent - 1
+        if cmd[-1] == "/":
+            cmd = cmd[0:-1]
+            indent = 0
+        cmd = ("\t" * next_indent) + cmd
         next_indent = indent
         script.append(cmd)
     script = '\n'.join(script)
     return script
 
+
 def split_script(cmd):
-    #split lines
-    cmd = cmd.replace("?;","?\n")
-    cmd = cmd.replace("/;","/\n")
-    cmd = cmd.replace(";","\n")
-    cmd = cmd.replace(":",":\n")
+    """Replace ; splits with new lines."""
+    cmd = cmd.replace("?;", "?\n")
+    cmd = cmd.replace("/;", "/\n")
+    cmd = cmd.replace(";", "\n")
+    cmd = cmd.replace(":", ":\n")
     return cmd
 
+
 def main(argv, stdout, environ):
+    """Execute main function."""
     progname = argv[0]
-    split_lines=False
-    FS = ' '
+    split_lines = False
+    FS = ' '                                               # noqa: N806
     print_input = False
     strip_newlines = False
     no_print_input = False
     output_script = False
-    F =[]
+    F = []                                                 # noqa: N806
 
-    def I(x): return int(F[x])
+    def I(x):                                              # noqa: N806
+        return int(F[x])                                   # noqa: N806
 
-    def f(x): return float(F[x])
+    def f(x):
+        return float(F[x])                                 # noqa: N806
+
     # parse options for module imports
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'oaplneM:F:')
@@ -154,7 +169,7 @@ def main(argv, stdout, environ):
     if "-a" in opts:
         split_lines = True
     if '-F' in opts:
-        FS = opts['-F']
+        FS = opts['-F']                                    # noqa: N806
     if "-p" in opts:
         print_input = True
     if "-l" in opts:
@@ -168,22 +183,22 @@ def main(argv, stdout, environ):
 
     cmd = ' '.join(args)
     if not cmd.strip():
-        cmd = 'line'                        # no-op
+        cmd = 'line'                                       # no-op
 
     begin_cmd = ''
     end_cmd = ''
 
     if cmd.find("BEGIN:") >= 0:
-        start=cmd.find("BEGIN:")
-        end=cmd.find("#/")
-        begin_cmd=cmd[start+6:end]
-        cmd=cmd[end+2:]
+        start = cmd.find("BEGIN:")
+        end = cmd.find("#/")
+        begin_cmd = cmd[start + 6:end]
+        cmd = cmd[end + 2:]
 
     if cmd.find("END:") >= 0:
-        start=cmd.find("END:")
-        end=cmd.find("#/")
-        end_cmd=cmd[start+4:end]
-        cmd=cmd[:start]
+        start = cmd.find("END:")
+        end = cmd.find("#/")
+        end_cmd = cmd[start + 4:end]
+        cmd = cmd[:start]
 
     cmd = split_script(cmd)
     script_lines = cmd.splitlines()
@@ -196,7 +211,7 @@ def main(argv, stdout, environ):
         begin_script = indent_script(begin_lines)
 
         begin_codeobj = compile(begin_script, 'command', 'exec')
-        result =  eval(begin_codeobj, globals(), locals())
+        result = eval(begin_codeobj, globals(), locals())
         if result is None or result is False:
             result = ''
         elif isinstance(result, list) or isinstance(result, tuple):
@@ -204,7 +219,6 @@ def main(argv, stdout, environ):
         else:
             result = str(result)
         write(result)
-
 
     if len(end_cmd) > 1:
         end_cmd = split_script(end_cmd)
@@ -214,7 +228,7 @@ def main(argv, stdout, environ):
 
     script = indent_script(script_lines)
 
-    if output_script == True:
+    if output_script:
         print "BEGIN:"
         print begin_script
         print
@@ -224,35 +238,37 @@ def main(argv, stdout, environ):
         print end_script
         print
 
-    #compile script
+    # compile script
     codeobj = compile(script, 'command', 'exec')
 
     if print_input or no_print_input:
         for num, line in enumerate(sys.stdin):
-            #line = line[:-1]
-            NR = num + 1
-            if strip_newlines == True:
+            # line = line[:-1]
+            NR = num + 1                                   # noqa: N806
+            if strip_newlines:
                 line = line.strip()
-            if print_input == True:
+            if print_input:
                 print(line)
-            if split_lines == True:
-                F = [w for w in line.split(FS) if len(w)]
-            result =  eval(codeobj, globals(), locals())
+            if split_lines:
+                F = [w for w in line.split(FS) if len(w)]  # noqa: N806
+
+            result = eval(codeobj, globals(), locals())
             if result is None or result is False:
                 continue
             elif isinstance(result, list) or isinstance(result, tuple):
                 result = ' '.join(map(str, result))
             else:
                 result = str(result)
-            write(result)
-            if strip_newlines == True:
-               write('\n')
 
+            write(result)
+
+            if strip_newlines:
+                write('\n')
     else:
-        result =  eval(codeobj, globals(), locals())
+        result = eval(codeobj, globals(), locals())
 
     if len(end_cmd) > 1:
-        result =  eval(end_codeobj, globals(), locals())
+        result = eval(end_codeobj, globals(), locals())
         if result is None or result is False:
             result = ''
         elif isinstance(result, list) or isinstance(result, tuple):
@@ -260,6 +276,7 @@ def main(argv, stdout, environ):
         else:
             result = str(result)
         write(result)
+
 
 if __name__ == "__main__":
     main(sys.argv, sys.stdout, os.environ)
