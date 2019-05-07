@@ -43,20 +43,20 @@ def usage(progname):
     -F specifies the characters to split on with the -a option (default=" ")
     -p loops over and prints input.
     -n loops over and does not print input.
-    -l strips newlines on input, and adds them on output 
+    -l strips newlines on input, and adds them on output
     -M lets you specify module imports
     -o print out parsed and indented script on multiple lines
     -e (assumed - does nothing, added for Perl compatibility)
-    
+
     variables:
     F[] = split input
     line = current input line
     NR = current input line number
-    
+
     functions:
     I(x) = function returns F[x] cast to integer
     f(x) = function returns F[x] cast to float
-    
+
     script:
         newlines are specified with ";"
         ":" will start an indent for the following lines
@@ -93,7 +93,7 @@ cat test.txt | perl -F"," -lane 'BEGIN {$sum=0; } ;$sum=$sum+=@F[0] if @F[0]>90;
 """
 
 def version():
-    print "version: 1.0"
+    print "version: 1.1"
 
 write = sys.stdout.write
 
@@ -135,9 +135,9 @@ def main(argv, stdout, environ):
     no_print_input = False
     output_script = False
     F =[]
-    
+
     def I(x): return int(F[x])
-    
+
     def f(x): return float(F[x])
     # parse options for module imports
     try:
@@ -146,7 +146,7 @@ def main(argv, stdout, environ):
         print "Invalid Option!"
         usage(progname)
         return
-    
+
     opts = dict(opts)
     if '-M' in opts:
         for imp in opts['-M'].split(','):
@@ -169,30 +169,32 @@ def main(argv, stdout, environ):
     cmd = ' '.join(args)
     if not cmd.strip():
         cmd = 'line'                        # no-op
-    
+
     begin_cmd = ''
     end_cmd = ''
-    
+
     if cmd.find("BEGIN:") >= 0:
         start=cmd.find("BEGIN:")
         end=cmd.find("#/")
         begin_cmd=cmd[start+6:end]
         cmd=cmd[end+2:]
-        
+
     if cmd.find("END:") >= 0:
         start=cmd.find("END:")
         end=cmd.find("#/")
         end_cmd=cmd[start+4:end]
         cmd=cmd[:start]
-    
+
     cmd = split_script(cmd)
     script_lines = cmd.splitlines()
-    
+    begin_script = ''
+    end_script = ''
+
     if len(begin_cmd) > 1:
         begin_cmd = split_script(begin_cmd)
         begin_lines = begin_cmd.splitlines()
         begin_script = indent_script(begin_lines)
-    
+
         begin_codeobj = compile(begin_script, 'command', 'exec')
         result =  eval(begin_codeobj, globals(), locals())
         if result is None or result is False:
@@ -202,29 +204,29 @@ def main(argv, stdout, environ):
         else:
             result = str(result)
         write(result)
-    
-    
+
+
     if len(end_cmd) > 1:
         end_cmd = split_script(end_cmd)
         end_lines = end_cmd.splitlines()
         end_script = indent_script(end_lines)
         end_codeobj = compile(end_script, 'command', 'exec')
-        
+
     script = indent_script(script_lines)
-    
+
     if output_script == True:
         print "BEGIN:"
-        print begin_script 
+        print begin_script
         print
-        print script 
+        print script
         print
         print "END:"
-        print end_script 
+        print end_script
         print
-    
-    #compile script   
+
+    #compile script
     codeobj = compile(script, 'command', 'exec')
-    
+
     if print_input or no_print_input:
         for num, line in enumerate(sys.stdin):
             #line = line[:-1]
@@ -245,11 +247,11 @@ def main(argv, stdout, environ):
             write(result)
             if strip_newlines == True:
                write('\n')
-    
+
     else:
         result =  eval(codeobj, globals(), locals())
-        
-    if len(end_cmd) > 1:    
+
+    if len(end_cmd) > 1:
         result =  eval(end_codeobj, globals(), locals())
         if result is None or result is False:
             result = ''
@@ -258,6 +260,6 @@ def main(argv, stdout, environ):
         else:
             result = str(result)
         write(result)
-    
+
 if __name__ == "__main__":
     main(sys.argv, sys.stdout, os.environ)
